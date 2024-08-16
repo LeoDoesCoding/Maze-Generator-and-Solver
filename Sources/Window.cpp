@@ -1,19 +1,25 @@
 #include <SFML/Graphics.hpp>
-#include "Maze.h"
-#include "Solver.h"
-#include <iostream>
+#include "../Headers/Maze.h"
+#include "../Headers/Solver.h"
+#include <iostream> //For debugging
 
 using namespace sf;
 
 int main() {
     RenderWindow window(VideoMode(950, 800), "Maze Solver");
-    //CircleShape shape(100.f);
-    //shape.setFillColor(Color::Green);
-
     Maze::defaultMaze();
     //Generate visual for maze
     RectangleShape walls(sf::Vector2f(Maze::getX() * 100,  Maze::getY() * 100));
-    walls.setFillColor(Color::Green);
+    walls.setPosition(100, 100);
+    walls.setFillColor(Color::Blue);
+    window.draw(walls);
+    for (auto& space : Maze::getMaze()) {
+        window.draw(space.second->nodeShape);
+    }
+    for (auto& bridge : Maze::getBridges()) {
+        window.draw(bridge.second);
+    }
+    window.display();
 
     //PathNode* path = Solver::DFS(Maze::maze->start);
 
@@ -23,11 +29,7 @@ int main() {
             if (event.type == Event::Closed)
                 window.close();
         }
-
-        window.clear();
-        window.draw(walls);
-        window.display();
     }
 
     return 0;
-}
+};
