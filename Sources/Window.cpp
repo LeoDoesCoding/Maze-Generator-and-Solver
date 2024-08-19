@@ -9,8 +9,8 @@ int main() {
     RenderWindow window(VideoMode(950, 800), "Maze Solver");
     Maze::randomMaze();
     //Generate visual for maze
-    RectangleShape walls(sf::Vector2f(Maze::getX() * 100,  Maze::getY() * 100));
-    walls.setPosition(100, 100);
+    RectangleShape walls(sf::Vector2f(Maze::getX() * Maze::getMult(), Maze::getY() * Maze::getMult()));
+    walls.setPosition(Maze::getMult(), Maze::getMult());
     walls.setFillColor(Color::Blue);
     window.draw(walls);
     for (auto& space : Maze::getMaze()) {

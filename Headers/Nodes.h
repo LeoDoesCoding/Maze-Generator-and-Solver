@@ -7,6 +7,15 @@ struct Terminals;
 
 #ifndef NODE_H
 #define NODE H
+
+static enum Directions {
+    NORTH,
+    EAST,
+    SOUTH,
+    WEST,
+    DIRECTIONS
+};
+
 struct Node {
     Node* North = nullptr;
     Node* East = nullptr;
@@ -17,9 +26,9 @@ struct Node {
     //GUI properties
     sf::RectangleShape nodeShape;
 
-    Node() {
+    Node(short size) {
         nodeShape.setFillColor(sf::Color::White);
-        nodeShape.setSize(sf::Vector2f(80.0f, 80.0f));
+        nodeShape.setSize(sf::Vector2f(size, size));
     }
 };
 
