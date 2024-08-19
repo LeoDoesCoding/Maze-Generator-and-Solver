@@ -7,7 +7,7 @@ using namespace sf;
 
 int main() {
     RenderWindow window(VideoMode(950, 800), "Maze Solver");
-    Maze::defaultMaze();
+    Maze::randomMaze();
     //Generate visual for maze
     RectangleShape walls(sf::Vector2f(Maze::getX() * 100,  Maze::getY() * 100));
     walls.setPosition(100, 100);

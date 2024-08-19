@@ -4,14 +4,13 @@ bool found = false;
 
 using namespace std;
 
-PathNode* Solver::DFS(Node * current) {
-    cout << "At node " << current->value << endl;
+/*PathNode* Solver::DFS(Node* current) {
     current->visited = true;
     PathNode* pointer;
     PathNode* path = new PathNode(current);
 
     //Current node is destination
-    if (current == Maze::getPoints()->end) {
+    if (current == Maze::getDestination()) {
         found = true;
         return (path);
     }
@@ -49,4 +48,4 @@ PathNode* Solver::DFS(Node * current) {
         }
     }
     return (path);
-}
+}*/

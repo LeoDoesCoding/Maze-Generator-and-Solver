@@ -8,7 +8,6 @@ struct Terminals;
 #ifndef NODE_H
 #define NODE H
 struct Node {
-    short value;
     Node* North = nullptr;
     Node* East = nullptr;
     Node* South = nullptr;
@@ -18,8 +17,7 @@ struct Node {
     //GUI properties
     sf::RectangleShape nodeShape;
 
-    Node(short value) {
-        this->value = value;
+    Node() {
         nodeShape.setFillColor(sf::Color::White);
         nodeShape.setSize(sf::Vector2f(80.0f, 80.0f));
     }
@@ -33,13 +31,7 @@ struct PathNode {
     PathNode(Node* current) { this->current = current; }
 };
 
-//Starting from and endpoint
-struct Terminals {
-    Node* start;
-    Node* end;
-    Terminals(Node* start) { this->start = start; }
-};
-
+//Pair of X Y integer values
 struct Coordinates {
     short X;
     short Y;
