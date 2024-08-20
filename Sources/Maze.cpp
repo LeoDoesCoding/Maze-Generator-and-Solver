@@ -16,116 +16,164 @@ void Maze::setDimensions(short x, short y) {
 
 //Generate random maze (of defined currently hard-coded dimensions)
 void Maze::randomMaze() {
-    setDimensions(8, 8);
-    mult = 600/dimensions.Y;
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_int_distribution<> distrib(0, DIRECTIONS - 1);
+    setDimensions(10, 10);
+    mult = 600 / dimensions.Y;
 
     //Terminal nodes (start and end points)
     maze[{1, 1}] = new Node(mult);
-    maze[{ dimensions.X, dimensions.Y }] = new Node(mult);
     maze[{1, 1}]->nodeShape.setPosition(mult, mult);
-    maze[{dimensions.X, dimensions.Y}]->nodeShape.setPosition(mult, mult);
 
     Coordinates pointer = Coordinates(1, 1);
     Coordinates previous = Coordinates(1, 1);
     Directions direction;
-    sf::RectangleShape bridge = sf::RectangleShape();
+    short corridor;
+    bool valid = true;
+    auto it = maze.begin();
 
 
     while (!(pointer.X == dimensions.X && pointer.Y == dimensions.Y)) { //Attempt directions until not out-of-bounds
-        direction = static_cast<Directions>(distrib(gen));
+        direction = Directions(rand() % 4);
+        corridor = short(rand() % 2);
+        valid = true;
+        it = maze.begin();
+        advance(it, rand() % maze.size());
+        pointer = it->first;
+        previous = it->first;
+
         switch (direction) {
         case NORTH:
-            //If it is out of bounds, try again
-            if (pointer.Y - 1 < 1) { continue; }
-
-            pointer.Y -= 1;
-
-            //Has not been traversed yet. Create bridge.
-            if (maze[previous]->North == nullptr) {
-                placeNode(pointer);
-
-                bridge.setPosition(previous.X * mult, (previous.Y-0.4) * mult);
-                bridge.setSize(sf::Vector2f(0.6*mult, mult*0.4));
-                bridges[make_pair(pointer, previous)] = bridge;
-
-                maze[previous]->North = maze[pointer];
-                maze[pointer]->South = maze[previous];
+            //Retry if either: out of bounds OR collides with another node
+            for (short i = 0; i < corridor; i++) {
+                if (pointer.Y - i - 1 == 0 || (maze.count({ pointer.X, short(pointer.Y - i - 1) }) != 0 && i != corridor)) {
+                    cout << "Out of bounds" << endl;
+                    valid = false;
+                    break;
+                }
             }
+            if (!valid) { continue; }
+
+            //Create nodes
+            for (short i = 0; i < corridor; i++) {
+                pointer.Y -= 1;
+                if (maze[previous]->North == nullptr) {
+                    placeNode(pointer, previous, NORTH);
+                }
+                previous = pointer;
+            }            
 
             break;
 
         case EAST:
-            //If it is out of bounds, try again
-            if (pointer.X + 1 > dimensions.X) { continue; }
+            //Retry if either: out of bounds OR collides with another node
+            for (short i = 0; i < corridor; i++) {
+                if (pointer.X + i + 1 > dimensions.X || (maze.count({ short(pointer.X + i + 1), pointer.Y}) != 0 && i != corridor)) {
+                    cout << "Out of bounds" << endl;
+                    valid = false;
+                    break;
+                }
+            }
+            if (!valid) { continue; }
 
-            pointer.X += 1;
-
-            //Has not been traversed yet. Create bridge.
-            if (maze[previous]->East == nullptr) {
-                placeNode(pointer);
-
-                bridge.setPosition((previous.X+0.6) * mult, previous.Y * mult);
-                bridge.setSize(sf::Vector2f(0.4*mult, mult * 0.6));
-                bridges[make_pair(pointer, previous)] = bridge;
-
-                maze[previous]->East = maze[pointer];
-                maze[pointer]->West = maze[previous];
+            //Create nodes
+            for (short i = 0; i < corridor; i++) {
+                pointer.X += 1;
+                if (maze[previous]->East == nullptr) {
+                    placeNode(pointer, previous, EAST);
+                }
+                previous = pointer;
             }
 
             break;
 
         case SOUTH:
-            //If it is out of bounds, try again
-            if (pointer.Y + 1 > dimensions.Y) { continue; }
+            //Retry if either: out of bounds OR collides with another node
+            for (short i = 0; i < corridor; i++) {
+                if (pointer.Y + i + 1 > dimensions.Y || (maze.count({ pointer.X, short(pointer.Y + i + 1) }) != 0 && i != corridor)) {
+                    cout << "Out of bounds" << endl;
+                    valid = false;
+                    break;
+                }
+            }
+            if (!valid) { continue; }
 
-            pointer.Y += 1;
-
-            //Has not been traversed yet. Create bridge.
-            if (maze[previous]->South == nullptr) {
-                placeNode(pointer);
-
-                bridge.setPosition((previous.X) * mult, (previous.Y+0.6) * mult);
-                bridge.setSize(sf::Vector2f(mult * 0.6, 0.4*mult));
-                bridges[make_pair(pointer, previous)] = bridge;
-
-                maze[previous]->South = maze[pointer];
-                maze[pointer]->North = maze[previous];
+            //Create nodes
+            for (short i = 0; i < corridor; i++) {
+                pointer.Y += 1;
+                if (maze[previous]->South == nullptr) {
+                    placeNode(pointer, previous, SOUTH);
+                }
+                previous = pointer;
             }
 
             break;
 
         case WEST:
-            //If it is out of bounds, try again
-            if (pointer.X - 1 < 1) { continue; }
+            //Retry if either: out of bounds OR collides with another node
+            for (short i = 0; i < corridor; i++) {
+                if (pointer.X - i - 1 == 0 || (maze.count({ short(pointer.X - i - 1), pointer.Y}) != 0 && i != corridor)) {
+                    cout << "Out of bounds" << endl;
+                    valid = false;
+                    break;
+                }
+            }
+            if (!valid) { continue; }
 
-            pointer.X -= 1;
-
-            //Has not been traversed yet. Create bridge.
-            if (maze[previous]->West == nullptr) {
-                placeNode(pointer);
-
-                bridge.setPosition((previous.X-0.4) * mult, previous.Y * mult);
-                bridge.setSize(sf::Vector2f(0.4*mult, mult * 0.6));
-                bridges[make_pair(pointer, previous)] = bridge;
-
-                maze[previous]->West = maze[pointer];
-                maze[pointer]->East = maze[previous];
+            //Create nodes
+            for (short i = 0; i < corridor; i++) {
+                pointer.X -= 1;
+                if (maze[previous]->West == nullptr) {
+                    placeNode(pointer, previous, WEST);
+                }
+                previous = pointer;
             }
 
             break;
         }
-        previous = pointer;
+        cout << "Next" << endl;
     }
     std::cout << "Finished." << endl;
 }
 
 
-void Maze::placeNode(Coordinates pointer) {
+void Maze::placeNode(Coordinates pointer, Coordinates previous, Directions direction) {
+    sf::RectangleShape bridge = sf::RectangleShape();
     if (maze.count(pointer) == 0) { //If there is no node in that space already, create a new one
-        maze[pointer] = new Node(mult*0.6);
+        maze[pointer] = new Node(mult * 0.6);
         maze[pointer]->nodeShape.setPosition(pointer.X * (mult), pointer.Y * (mult));
+    }
+
+    switch (direction) {
+    case NORTH:
+        bridge.setPosition(previous.X * mult, (previous.Y - 0.4) * mult);
+        bridge.setSize(sf::Vector2f(0.6 * mult, mult * 0.4));
+        bridges[make_pair(pointer, previous)] = bridge;
+
+        maze[previous]->North = maze[pointer];
+        maze[pointer]->South = maze[previous];
+        break;
+    case EAST:
+        bridge.setPosition((previous.X + 0.6) * mult, previous.Y * mult);
+        bridge.setSize(sf::Vector2f(0.4 * mult, mult * 0.6));
+        bridges[make_pair(pointer, previous)] = bridge;
+
+        maze[previous]->East = maze[pointer];
+        maze[pointer]->West = maze[previous];
+        break;
+    case SOUTH:
+        bridge.setPosition((previous.X) * mult, (previous.Y + 0.6) * mult);
+        bridge.setSize(sf::Vector2f(mult * 0.6, 0.4 * mult));
+        bridges[make_pair(pointer, previous)] = bridge;
+
+        maze[previous]->South = maze[pointer];
+        maze[pointer]->North = maze[previous];
+        break;
+    case WEST:
+        bridge.setPosition((previous.X - 0.4) * mult, previous.Y * mult);
+        bridge.setSize(sf::Vector2f(0.4 * mult, mult * 0.6));
+        bridges[make_pair(pointer, previous)] = bridge;
+
+        maze[previous]->West = maze[pointer];
+        maze[pointer]->East = maze[previous];
+        break;
     }
 }

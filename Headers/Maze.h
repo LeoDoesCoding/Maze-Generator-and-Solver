@@ -18,6 +18,6 @@ private:
     static Coordinates dimensions;             //Maze size
     static std::map<std::pair<Coordinates, Coordinates>, sf::RectangleShape> bridges;  //Connecting lines between nodes in maze visual
     static void setDimensions(short x, short y);
-    static void placeNode(Coordinates);
+    static void placeNode(Coordinates, Coordinates, Directions);
     static short mult;
 };
