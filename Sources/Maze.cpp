@@ -4,10 +4,6 @@
 #include "../Headers/Maze.h"
 
 using namespace std;
-std::map<Coordinates, Node*> Maze::maze;
-Coordinates Maze::dimensions{ 0,0 };
-std::map<std::pair<Coordinates, Coordinates>, sf::RectangleShape> Maze::bridges;
-short Maze::mult;
 
 void Maze::setDimensions(short x, short y) {
     dimensions.X = x;
@@ -16,22 +12,30 @@ void Maze::setDimensions(short x, short y) {
 
 //Generate random maze (of defined currently hard-coded dimensions)
 void Maze::randomMaze() {
-    setDimensions(10, 10);
+    setDimensions(8, 8);
     mult = 600 / dimensions.Y;
 
     //Terminal nodes (start and end points)
     maze[{1, 1}] = new Node(mult);
     maze[{1, 1}]->nodeShape.setPosition(mult, mult);
 
+    gen1();
+}
+
+//Maze-generating algorithm 1
+void Maze::gen1() {
     Coordinates pointer = Coordinates(1, 1);
     Coordinates previous = Coordinates(1, 1);
     Directions direction;
     short corridor;
     bool valid = true;
     auto it = maze.begin();
+    short iteration = 0;
 
 
     while (!(pointer.X == dimensions.X && pointer.Y == dimensions.Y)) { //Attempt directions until not out-of-bounds
+        cout << "Iteration " << iteration << endl;
+        iteration++;
         direction = Directions(rand() % 4);
         corridor = short(rand() % 2);
         valid = true;
@@ -44,8 +48,11 @@ void Maze::randomMaze() {
         case NORTH:
             //Retry if either: out of bounds OR collides with another node
             for (short i = 0; i < corridor; i++) {
+                if (pointer.X == dimensions.X && pointer.Y - i - 1 == dimensions.Y) {
+                    break;
+                }
                 if (pointer.Y - i - 1 == 0 || (maze.count({ pointer.X, short(pointer.Y - i - 1) }) != 0 && i != corridor)) {
-                    cout << "Out of bounds" << endl;
+                    //cout << "Out of bounds" << endl;
                     valid = false;
                     break;
                 }
@@ -59,15 +66,18 @@ void Maze::randomMaze() {
                     placeNode(pointer, previous, NORTH);
                 }
                 previous = pointer;
-            }            
+            }
 
             break;
 
         case EAST:
             //Retry if either: out of bounds OR collides with another node
             for (short i = 0; i < corridor; i++) {
-                if (pointer.X + i + 1 > dimensions.X || (maze.count({ short(pointer.X + i + 1), pointer.Y}) != 0 && i != corridor)) {
-                    cout << "Out of bounds" << endl;
+                if (pointer.X + i + 1 == dimensions.X && pointer.Y == dimensions.Y) {
+                    break;
+                }
+                if (pointer.X + i + 1 > dimensions.X || (maze.count({ short(pointer.X + i + 1), pointer.Y }) != 0 && i != corridor)) {
+                    //cout << "Out of bounds" << endl;
                     valid = false;
                     break;
                 }
@@ -88,8 +98,11 @@ void Maze::randomMaze() {
         case SOUTH:
             //Retry if either: out of bounds OR collides with another node
             for (short i = 0; i < corridor; i++) {
+                if (pointer.X == dimensions.X && pointer.Y + i + 1 == dimensions.Y) {
+                    break;
+                }
                 if (pointer.Y + i + 1 > dimensions.Y || (maze.count({ pointer.X, short(pointer.Y + i + 1) }) != 0 && i != corridor)) {
-                    cout << "Out of bounds" << endl;
+                    //cout << "Out of bounds" << endl;
                     valid = false;
                     break;
                 }
@@ -110,8 +123,11 @@ void Maze::randomMaze() {
         case WEST:
             //Retry if either: out of bounds OR collides with another node
             for (short i = 0; i < corridor; i++) {
-                if (pointer.X - i - 1 == 0 || (maze.count({ short(pointer.X - i - 1), pointer.Y}) != 0 && i != corridor)) {
-                    cout << "Out of bounds" << endl;
+                if (pointer.X - i - 1 == dimensions.X && pointer.Y == dimensions.Y) {
+                    break;
+                }
+                if (pointer.X - i - 1 == 0 || (maze.count({ short(pointer.X - i - 1), pointer.Y }) != 0 && i != corridor)) {
+                    //cout << "Out of bounds" << endl;
                     valid = false;
                     break;
                 }
@@ -129,10 +145,17 @@ void Maze::randomMaze() {
 
             break;
         }
-        cout << "Next" << endl;
+        //cout << "Next" << endl;
     }
     std::cout << "Finished." << endl;
 }
+
+/*void Maze::gen2() {
+    random_device rd;
+    mt19937 g(rd());
+
+    shuffle(directions, directions + sizeof(directions) / sizeof(directions[0]), g);
+}*/
 
 
 void Maze::placeNode(Coordinates pointer, Coordinates previous, Directions direction) {

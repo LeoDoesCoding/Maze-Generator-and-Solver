@@ -5,19 +5,21 @@
 
 class Maze {
 public:
-    //static void defaultMaze();
-    static void randomMaze();
-    static short getX() { return dimensions.X; }
-    static short getY() { return dimensions.Y; }
-    static short getMult() { return mult; }
-    static auto & getBridges() { return bridges; }
-    static auto & getMaze() { return maze; }
+    void randomMaze();
+    short getX() { return dimensions.X; }
+    short getY() { return dimensions.Y; }
+    short getMult() { return mult; }
+    auto & getBridges() { return bridges; }
+    auto & getMaze() { return maze; }
 
 private:
-    static std::map<Coordinates, Node*> maze;  //Corrisponding maze coordinates
-    static Coordinates dimensions;             //Maze size
-    static std::map<std::pair<Coordinates, Coordinates>, sf::RectangleShape> bridges;  //Connecting lines between nodes in maze visual
-    static void setDimensions(short x, short y);
-    static void placeNode(Coordinates, Coordinates, Directions);
-    static short mult;
+    std::map<Coordinates, Node*> maze;  //Corrisponding maze coordinates
+    Coordinates dimensions;             //Maze size
+    std::map<std::pair<Coordinates, Coordinates>, sf::RectangleShape> bridges;  //Connecting lines between nodes in maze visual
+    void setDimensions(short x, short y);
+    void placeNode(Coordinates, Coordinates, Directions);
+    short mult;
+    void gen1();
+    void gen2();
+    Directions directions[4] = { NORTH, EAST, SOUTH, WEST };
 };

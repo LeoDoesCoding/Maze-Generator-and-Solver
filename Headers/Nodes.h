@@ -13,7 +13,6 @@ static enum Directions {
     EAST,
     SOUTH,
     WEST,
-    DIRECTIONS
 };
 
 struct Node {
@@ -49,6 +48,7 @@ struct Coordinates {
         if (X > other.X) return false;
         return Y < other.Y;
     }
+    Coordinates() {}
     Coordinates(short X, short Y) { this->X = X; this->Y = Y; }
 };
 
