@@ -1,20 +1,26 @@
+#pragma once
 #include <SFML/Graphics.hpp>
-#include "../Headers/Maze.h"
-#include "../Headers/Solver.h"
+#include "../Headers/GUI.h"
 #include <iostream> //For debugging
 
 using namespace sf;
-void drawMaze(Maze*, RenderWindow*);
+sf::RenderWindow GUI::window;
+Maze GUI::maze;
 
 int main() {
-    RenderWindow window(VideoMode(950, 800), "Maze Solver");
+    GUI::setup();
+    return 0;
+};
+
+
+void GUI::setup() {
+    window.create(VideoMode(950, 800), "Maze Solver");
     window.setKeyRepeatEnabled(false);
     srand(time(NULL));
-    Maze *maze = new Maze();
-    maze->randomMaze();
-    drawMaze(maze, &window);
+    maze.randomMaze();
+    drawMaze();
 
-    //PathNode* path = Solver::DFS(maze.maze->start);
+    Solver::DFS(maze.getStart(), maze.getGoal());
 
     while (window.isOpen()) {
         Event event;
@@ -25,31 +31,30 @@ int main() {
             if (event.type == sf::Event::KeyPressed) {
                 if (event.key.scancode == sf::Keyboard::Scan::Space) {
                     std::cout << "Space pressed" << std::endl;
-                    delete maze;
-                    maze = new Maze();
-                    maze->randomMaze();
-                    drawMaze(maze, &window);
+                    maze = Maze();
                 }
             }
         }
     }
+}
 
-    return 0;
-};
+void GUI::drawPath(Node* first, Node* second) {
+    second->nodeShape.setFillColor(sf::Color::Green);
+    maze.getBridge({ static_cast<short>(first->nodeShape.getPosition().x/maze.getMult()), static_cast<short>(first->nodeShape.getPosition().y / maze.getMult()) }, { static_cast<short>(second->nodeShape.getPosition().x / maze.getMult()), static_cast<short>(second->nodeShape.getPosition().y / maze.getMult()) }).setFillColor(sf::Color::Green);
+    drawMaze();
+}
 
-
-void drawMaze(Maze* maze, RenderWindow* window) {
-    //Generate visual for maze
-    window->clear();
-    RectangleShape walls(sf::Vector2f(maze->getX() * maze->getMult(), maze->getY() * maze->getMult()));
-    walls.setPosition(maze->getMult(), maze->getMult());
+void GUI::drawMaze() {
+    window.clear();
+    RectangleShape walls(sf::Vector2f(maze.getX() * maze.getMult(), maze.getY() * maze.getMult()));
+    walls.setPosition(maze.getMult(), maze.getMult());
     walls.setFillColor(Color::Blue);
-    window->draw(walls);
-    for (auto& space : maze->getMaze()) {
-        window->draw(space.second->nodeShape);
+    window.draw(walls);
+    for (auto& space : maze.getMaze()) {
+        window.draw(space.second->nodeShape);
     }
-    for (auto& bridge : maze->getBridges()) {
-        window->draw(bridge.second);
+    for (auto& bridge : maze.getBridges()) {
+        window.draw(bridge.second);
     }
-    window->display();
-};
+    window.display();
+}

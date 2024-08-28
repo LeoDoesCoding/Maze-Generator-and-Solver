@@ -10,7 +10,15 @@ public:
     short getY() { return dimensions.Y; }
     short getMult() { return mult; }
     auto & getBridges() { return bridges; }
+    sf::RectangleShape & getBridge(Coordinates node1, Coordinates node2) {
+        if (bridges.count({ node1, node2 }) == 0) {
+            return bridges[std::make_pair(node2, node1)];
+        } else { return bridges[std::make_pair(node1, node2)]; }
+     }
     auto & getMaze() { return maze; }
+    bool isComplete() & { return complete; }
+    Node* getStart() & { return maze[{1, 1}]; }
+    Node* getGoal() & { return maze[{dimensions.X, dimensions.Y}]; }
 
 private:
     std::map<Coordinates, Node*> maze;  //Corrisponding maze coordinates
@@ -21,5 +29,6 @@ private:
     short mult;
     void gen1();
     void gen2();
+    bool complete = false;
     Directions directions[4] = { NORTH, EAST, SOUTH, WEST };
 };

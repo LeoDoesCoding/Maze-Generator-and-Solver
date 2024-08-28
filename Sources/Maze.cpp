@@ -12,12 +12,13 @@ void Maze::setDimensions(short x, short y) {
 
 //Generate random maze (of defined currently hard-coded dimensions)
 void Maze::randomMaze() {
-    setDimensions(8, 8);
+    setDimensions(7, 7);
     mult = 600 / dimensions.Y;
 
     //Terminal nodes (start and end points)
     maze[{1, 1}] = new Node(mult);
     maze[{1, 1}]->nodeShape.setPosition(mult, mult);
+    maze[{1, 1}]->nodeShape.setFillColor(sf::Color::Green);
 
     gen1();
 }
@@ -34,7 +35,7 @@ void Maze::gen1() {
 
 
     while (!(pointer.X == dimensions.X && pointer.Y == dimensions.Y)) { //Attempt directions until not out-of-bounds
-        cout << "Iteration " << iteration << endl;
+        //cout << "Iteration " << iteration << endl;
         iteration++;
         direction = Directions(rand() % 4);
         corridor = short(rand() % 2);

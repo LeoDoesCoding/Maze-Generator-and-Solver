@@ -1,23 +1,27 @@
+#pragma once
 #include <iostream>
 #include "../Headers/Solver.h"
+#include "../Headers/GUI.h"
 bool found = false;
 
 using namespace std;
 
-/*PathNode* Solver::DFS(Node* current) {
+PathNode* Solver::DFS(Node* current, Node* goal) {
+    sf::sleep(sf::seconds(0.1));
     current->visited = true;
     PathNode* pointer;
     PathNode* path = new PathNode(current);
 
     //Current node is destination
-    if (current == Maze::getDestination()) {
+    if (current == goal) {
         found = true;
         return (path);
     }
 
     //If not, search each direction.
     if (current->North != nullptr && !current->North->visited) {
-        pointer = DFS(current->North);
+        GUI::drawPath(current, current->North);
+        pointer = DFS(current->North, goal);
         if (found) {
             path->next = pointer;
             return (path);
@@ -25,7 +29,8 @@ using namespace std;
     }
 
     if (current->East != nullptr && !current->East->visited) {
-        pointer = DFS(current->East);
+        GUI::drawPath(current, current->East);
+        pointer = DFS(current->East, goal);
         if (found) {
             path->next = pointer;
             return (path);
@@ -33,7 +38,8 @@ using namespace std;
     }
 
     if (current->South != nullptr && !current->South->visited) {
-        pointer = DFS(current->South);
+        GUI::drawPath(current, current->South);
+        pointer = DFS(current->South, goal);
         if (found) {
             path->next = pointer;
             return (path);
@@ -41,11 +47,12 @@ using namespace std;
     }
 
     if (current->West != nullptr && !current->West->visited) {
-        pointer = DFS(current->West);
+        GUI::drawPath(current, current->West);
+        pointer = DFS(current->West, goal);
         if (found) {
             path->next = pointer;
             return (path);
         }
     }
     return (path);
-}*/
+}
