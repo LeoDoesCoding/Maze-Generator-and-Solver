@@ -1,9 +1,10 @@
 #pragma once
-#include <functional>
 #include "Nodes.h"
-#include "Maze.h"
+#include "GUI.h"
+#include <iostream>
 
 class Solver {
 public:
 	static PathNode* DFS(Node* current, Node* goal);
+	static bool found;
 };

@@ -1,6 +1,3 @@
-#include <iostream>
-#include <map>
-#include <random>
 #include "../Headers/Maze.h"
 
 using namespace std;
@@ -11,12 +8,12 @@ void Maze::setDimensions(short x, short y) {
 }
 
 //Generate random maze (of defined currently hard-coded dimensions)
-void Maze::randomMaze() {
-    setDimensions(7, 7);
+void Maze::randomMaze(short size) {
+    setDimensions(size, size);
     mult = 600 / dimensions.Y;
 
-    //Terminal nodes (start and end points)
-    maze[{1, 1}] = new Node(mult);
+    //Starting node
+    maze[{1, 1}] = new Node(mult*0.6);
     maze[{1, 1}]->nodeShape.setPosition(mult, mult);
     maze[{1, 1}]->nodeShape.setFillColor(sf::Color::Green);
 
@@ -31,12 +28,9 @@ void Maze::gen1() {
     short corridor;
     bool valid = true;
     auto it = maze.begin();
-    short iteration = 0;
 
 
     while (!(pointer.X == dimensions.X && pointer.Y == dimensions.Y)) { //Attempt directions until not out-of-bounds
-        //cout << "Iteration " << iteration << endl;
-        iteration++;
         direction = Directions(rand() % 4);
         corridor = short(rand() % 2);
         valid = true;
@@ -53,7 +47,6 @@ void Maze::gen1() {
                     break;
                 }
                 if (pointer.Y - i - 1 == 0 || (maze.count({ pointer.X, short(pointer.Y - i - 1) }) != 0 && i != corridor)) {
-                    //cout << "Out of bounds" << endl;
                     valid = false;
                     break;
                 }
@@ -78,7 +71,6 @@ void Maze::gen1() {
                     break;
                 }
                 if (pointer.X + i + 1 > dimensions.X || (maze.count({ short(pointer.X + i + 1), pointer.Y }) != 0 && i != corridor)) {
-                    //cout << "Out of bounds" << endl;
                     valid = false;
                     break;
                 }
@@ -103,7 +95,6 @@ void Maze::gen1() {
                     break;
                 }
                 if (pointer.Y + i + 1 > dimensions.Y || (maze.count({ pointer.X, short(pointer.Y + i + 1) }) != 0 && i != corridor)) {
-                    //cout << "Out of bounds" << endl;
                     valid = false;
                     break;
                 }
@@ -128,7 +119,6 @@ void Maze::gen1() {
                     break;
                 }
                 if (pointer.X - i - 1 == 0 || (maze.count({ short(pointer.X - i - 1), pointer.Y }) != 0 && i != corridor)) {
-                    //cout << "Out of bounds" << endl;
                     valid = false;
                     break;
                 }
@@ -146,9 +136,7 @@ void Maze::gen1() {
 
             break;
         }
-        //cout << "Next" << endl;
     }
-    std::cout << "Finished." << endl;
 }
 
 /*void Maze::gen2() {

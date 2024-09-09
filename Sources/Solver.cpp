@@ -1,10 +1,7 @@
-#pragma once
-#include <iostream>
 #include "../Headers/Solver.h"
-#include "../Headers/GUI.h"
-bool found = false;
 
 using namespace std;
+bool Solver::found = false;
 
 PathNode* Solver::DFS(Node* current, Node* goal) {
     sf::sleep(sf::seconds(0.1));
@@ -12,13 +9,14 @@ PathNode* Solver::DFS(Node* current, Node* goal) {
     PathNode* pointer;
     PathNode* path = new PathNode(current);
 
-    //Current node is destination
+    //End if current node is destination
     if (current == goal) {
         found = true;
+        std::cout << "DONE" << std::endl;
         return (path);
     }
 
-    //If not, search each direction.
+    //Search each direction
     if (current->North != nullptr && !current->North->visited) {
         GUI::drawPath(current, current->North);
         pointer = DFS(current->North, goal);

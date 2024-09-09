@@ -1,9 +1,9 @@
 #pragma once
+#include <utility>
 #include <SFML/Graphics.hpp>
 struct Node;
 struct PathNode;
 struct Terminals;
-#include <utility>
 
 #ifndef NODE_H
 #define NODE H
