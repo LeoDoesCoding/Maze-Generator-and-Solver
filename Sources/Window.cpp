@@ -4,9 +4,14 @@ using namespace sf;
 sf::RenderWindow GUI::window;
 Maze GUI::maze;
 sf::Text GUI::label;
+sf::Text GUI::regenLabel;
+sf::Text GUI::solverLabel;
 textBox GUI::sizeBox;
 sf::RectangleShape GUI::regenButton;
 sf::RectangleShape GUI::solverButton;
+sf::RectangleShape GUI::tile;
+bool GUI::input;
+int GUI::size;
 
 int main() {
     GUI::setup();
@@ -15,27 +20,42 @@ int main() {
 
 
 void GUI::setup() {
-    window.create(VideoMode(1000, 800), "Maze Solver");
+    window.create(VideoMode(1000, 750), "Maze Solver");
     window.setKeyRepeatEnabled(false);
     srand(time(NULL));
     font.loadFromFile("Arial.ttf");
+    input = true;
+    size = 5;
 
-    sizeBox = textBox();
-    sizeBox.setPosition(800, 140);
-    label.setString("Size:");
+    label.setString("Generation: 1\nSize:");
     label.setFont(font);
     label.setCharacterSize(28);
-    label.setPosition(800, 110);
-    regenButton.setFillColor(sf::Color::Cyan);
-    regenButton.setSize(sf::Vector2f(100, 30));
-    regenButton.setPosition(800, 600);
-    solverButton.setFillColor(sf::Color::Green);
-    solverButton.setSize(sf::Vector2f(100, 30));
-    solverButton.setPosition(800, 640);
+    label.setPosition(720, 20);
 
-    maze.randomMaze(std::stoi(sizeBox.getText()));
-    window.display();
-    drawMaze();
+    //Size Box
+    sizeBox = textBox();
+    sizeBox.setPosition(800, 55);
+
+    //Regenerate Button
+    regenButton.setFillColor(sf::Color::Cyan);
+    regenButton.setSize(sf::Vector2f(200, 40));
+    regenButton.setPosition(750,590);
+    regenLabel.setString("Generate");
+    regenLabel.setFont(font);
+    regenLabel.setColor(sf::Color::Black);
+    regenLabel.setPosition(790, 590);
+
+    //Solver Button
+    solverButton.setFillColor(sf::Color::Green);
+    solverButton.setSize(sf::Vector2f(200, 40));
+    solverButton.setPosition(750, 660);
+    solverLabel.setString("Solve");
+    solverLabel.setFont(font);
+    solverLabel.setColor(sf::Color::Black);
+    solverLabel.setPosition(810, 660);
+
+    maze.randomMaze(5);
+    update();
 
     while (window.isOpen()) {
         Event event;
@@ -43,59 +63,67 @@ void GUI::setup() {
             if (event.type == Event::Closed)
                 window.close();
 
-            if (event.type == sf::Event::KeyPressed) {
+            if (event.type == sf::Event::KeyPressed && sizeBox.mode) {
                 if (event.key.scancode == sf::Keyboard::Scan::Num0) {
-                    if (sizeBox.mode) { sizeBox.append('0'); }
+                    sizeBox.append('0');
                 } else if (event.key.scancode == sf::Keyboard::Scan::Num1) {
-                    if (sizeBox.mode) { sizeBox.append('1'); }
+                    sizeBox.append('1');
                 } else if (event.key.scancode == sf::Keyboard::Scan::Num2) {
-                    if (sizeBox.mode) { sizeBox.append('2'); }
+                    sizeBox.append('2');
                 } else if (event.key.scancode == sf::Keyboard::Scan::Num3) {
-                    if (sizeBox.mode) { sizeBox.append('3'); }
+                    sizeBox.append('3');
                 } else if (event.key.scancode == sf::Keyboard::Scan::Num4) {
-                    if (sizeBox.mode) { sizeBox.append('4'); }
+                    sizeBox.append('4');
                 } else if (event.key.scancode == sf::Keyboard::Scan::Num5) {
-                    if (sizeBox.mode) { sizeBox.append('5'); }
+                    sizeBox.append('5');
                 } else if (event.key.scancode == sf::Keyboard::Scan::Num6) {
-                    if (sizeBox.mode) { sizeBox.append('6'); }
+                    sizeBox.append('6');
                 } else if (event.key.scancode == sf::Keyboard::Scan::Num7) {
-                    if (sizeBox.mode) { sizeBox.append('7'); }
+                    sizeBox.append('7');
                 } else if (event.key.scancode == sf::Keyboard::Scan::Num8) {
-                    if (sizeBox.mode) { sizeBox.append('8'); }
+                    sizeBox.append('8');
                 } else if (event.key.scancode == sf::Keyboard::Scan::Num9) {
-                    if (sizeBox.mode) { sizeBox.append('9'); }
+                    sizeBox.append('9');
                 } else if (event.key.scancode == sf::Keyboard::Scan::Backspace) {
-                    if (sizeBox.mode) {
                         sizeBox.backSpace();
-                    }
                 } else if (event.key.scancode == sf::Keyboard::Scan::Enter) {
                     sizeBox.setMode(false);
                 }
-                drawMaze();
+                update();
             }
 
-            if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left) {
+            if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left && input) {
                 sf::Vector2f mouse = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+
+                //Size setter box clicked
                 sf::FloatRect bounds = sizeBox.box.getGlobalBounds();
                 if (bounds.contains(mouse)) {
-                    std::cout << "clicked" << std::endl;
                     sizeBox.setMode(true);
-                    drawMaze();
+                    update();
+                } else {
+                    if (sizeBox.mode) {
+                        sizeBox.setMode(false); 
+                        update();
+                    }
                 }
 
                 //Regenerate button clicked
                 bounds = regenButton.getGlobalBounds();
-                if (bounds.contains(mouse)) {
+                if (bounds.contains(mouse) && input) {
+                    size = sizeBox.getSize();
                     maze = Maze();
-                    maze.randomMaze(std::stoi(sizeBox.getText()));
-                    drawMaze();
+                    maze.randomMaze(size);
+                    update();
                 }
 
                 //Solver button clicked
                 bounds = solverButton.getGlobalBounds();
-                if (bounds.contains(mouse)) {
+                if (bounds.contains(mouse) && input) {
+                    maze.resetSolver();
                     Solver::found = false;
-                    Solver::DFS(maze.getStart(), maze.getGoal());
+                    GUI::disableInput();
+                    Solver::DFS({1,1}, maze.getStart(), maze.getGoal());
+                    GUI::enableInput();
                 }
 
             }
@@ -103,23 +131,41 @@ void GUI::setup() {
     }
 }
 
-void GUI::drawPath(Node* first, Node* second) {
-    second->nodeShape.setFillColor(sf::Color::Green);
-    maze.getBridge({ static_cast<short>(first->nodeShape.getPosition().x/maze.getMult()), static_cast<short>(first->nodeShape.getPosition().y / maze.getMult()) }, { static_cast<short>(second->nodeShape.getPosition().x / maze.getMult()), static_cast<short>(second->nodeShape.getPosition().y / maze.getMult()) }).setFillColor(sf::Color::Green);
-    drawMaze();
-}
-
-void GUI::drawMaze() {
+void GUI::update() {
     window.clear();
-    RectangleShape walls(sf::Vector2f(maze.getX() * maze.getMult(), maze.getY() * maze.getMult()));
-    walls.setPosition(maze.getMult(), maze.getMult());
+    RectangleShape walls(sf::Vector2f(680, 680));
+    walls.setPosition(20, 20);
     walls.setFillColor(Color::Blue);
     window.draw(walls);
+
+    //Draw nodes
+    tile.setSize(sf::Vector2f(510/size, 510/size));
     for (auto& space : maze.getMaze()) {
-        window.draw(space.second->nodeShape);
+    if (space.second->visited) {
+        tile.setFillColor(Color::Green);
+    } else {
+        tile.setFillColor(Color::White);
     }
-    for (auto& bridge : maze.getBridges()) {
-        window.draw(bridge.second);
+
+    tile.setSize(sf::Vector2f(510/size, 510/size));
+    tile.setPosition((space.first.X * 680 - 595) / size + 20, (space.first.Y * 680 - 595) / size + 20);
+    window.draw(tile);
+
+    //Draw bridges
+    if (space.second->visited) {
+        tile.setFillColor(Color::Green);
+    } else {
+        tile.setFillColor(Color::White);
+    }
+    tile.setPosition((space.first.X * 680 - 595) / size + 20, (space.first.Y * 680 - 595) / size + 20);
+    window.draw(tile);
+
+    if (space.second->East) {
+        drawBridge(space.first, EAST, (space.second->East->visited && space.second->visited));
+    }
+    if (space.second->South) {
+        drawBridge(space.first, SOUTH, (space.second->South->visited && space.second->visited));
+    }
     }
 
     window.draw(sizeBox.box);
@@ -127,5 +173,48 @@ void GUI::drawMaze() {
     window.draw(sizeBox.text);
     window.draw(regenButton);
     window.draw(solverButton);
+    window.draw(regenLabel);
+    window.draw(solverLabel);
     window.display();
+}
+
+void GUI::drawBridge(Coordinates node, Directions direction, bool traversed) {
+    if (traversed) {
+        tile.setFillColor(Color::Green);
+    } else {
+        tile.setFillColor(Color::White);
+    }
+
+    switch (direction) {
+        case NORTH:
+            tile.setSize(sf::Vector2f(510/size, 170/size+1));
+            tile.setPosition((node.Y * 680 - 85) / size + 20, (node.X * 680 - 595) / size + 20);
+            break;
+        case EAST:
+            tile.setSize(sf::Vector2f(170/size+1, 510/size));
+            tile.setPosition((node.X * 680 - 85) / size + 20, (node.Y * 680 - 595) / size + 20);
+            break;
+        case SOUTH:
+            tile.setSize(sf::Vector2f(510/size, 170/size+1));
+            tile.setPosition((node.X * 680 - 595) / size + 20, (node.Y * 680 - 85) / size + 20);
+            break;
+        case WEST:
+            tile.setSize(sf::Vector2f(170/size+1, 510/size));
+            tile.setPosition((node.Y * 680 - 595) / size + 20, (node.X * 680 - 85) / size + 20);
+            break;
+    }
+
+    window.draw(tile);
+}
+
+void GUI::disableInput() {
+    sizeBox.setMode(false);
+    regenButton.setFillColor(grey);
+    solverButton.setFillColor(grey);
+}
+
+void GUI::enableInput() {
+    regenButton.setFillColor(sf::Color::Cyan);
+    solverButton.setFillColor(sf::Color::Green);
+    update();
 }

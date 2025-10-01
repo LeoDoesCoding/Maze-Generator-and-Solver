@@ -8,7 +8,7 @@ struct Terminals;
 #ifndef NODE_H
 #define NODE H
 
-static enum Directions {
+enum Directions {
     NORTH,
     EAST,
     SOUTH,
@@ -21,14 +21,6 @@ struct Node {
     Node* South = nullptr;
     Node* West = nullptr;
     bool visited = false;
-
-    //GUI properties
-    sf::RectangleShape nodeShape;
-
-    Node(short size) {
-        nodeShape.setFillColor(sf::Color::White);
-        nodeShape.setSize(sf::Vector2f(size, size));
-    }
 };
 
 //Returned linked-list path from start to end node

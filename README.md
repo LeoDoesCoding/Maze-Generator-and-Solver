@@ -5,6 +5,16 @@ Todo:
  - Other maze-solving algorithms
  - Clean any code messes/optimise code
 
+ ## Project Parameters
+ - Generates a graph of nodes with a maximum of 4 bi-directional connections of equal value/distance, constrained by coordinate placement on a 2D array.
+    - There will always be a path from the start node to the end node.
+    - Not every coordinate has to have a node.
+ - Identifies a valid pathway.
+
+  ### Future Developments
+  - Add different algorithms for graph generation and path finding.
+  - Identify path of shortest distance.
+
 ## Algorithms
 ### Maze Generation Algorithm (Gen1)
 From a given starting coordinates, the first node is generated. Then, iterations occur to place nodes until the destination node is met. In each iteration, three values are generated at random:
@@ -16,9 +26,12 @@ Starting from the selected node, the path from here, in the direction selected a
 
 **Advantages**
  - Mazes *always* have a path from start to end.
- - Very maze-like, with dead ends and a rather full layout (not that there is a quantifiable standard for this, that I am aware of).
+ - Usually generates rather full layout (not that I have yet established a quantifiale standard for this).
 
 **Drawbacks**
- - High iteration count as there are lots of unusable collisions, thus generation is slow.
- - On average, the start->destination path is a fairly direct diagonal.
- - Sometimes draws some unfortunate patterns (sorry about that).
+ - Due to heavy reliance on RNG with no bias:
+    - Probabilistic non-terminating.
+    - A lot of invalid moves.
+    - Maze complexity has no garuntee.
+
+I appologies if the generator draws unfortunate patterns.

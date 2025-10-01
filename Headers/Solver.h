@@ -5,6 +5,6 @@
 
 class Solver {
 public:
-	static PathNode* DFS(Node* current, Node* goal);
+	static PathNode* DFS(Coordinates location, Node* current, Node* goal);
 	static bool found;
 };

@@ -5,43 +5,59 @@
 #ifndef GUI_H
 #define GUI H
 static sf::Font font;
-#endif
+static sf::Color grey = sf::Color(100, 100, 100);
 
 class textBox {
 public:
-	sf::Color grey = sf::Color(100, 100, 100);
+	bool mode = false;
+	std::string value = "5";
 
 	textBox() {
 		text.setString("5");
 		text.setFont(font);
-		mode = false;
 		box.setSize(sf::Vector2f(80, 30));
 		box.setFillColor(grey);
 		text.setFillColor(sf::Color::Black);
 		text.setCharacterSize(24);
 	}
 
-	void setMode(bool status) { //if user has clicked button, enable typing
+	void setMode(bool status) {
 		mode = status;
 		if (status) {
 			box.setFillColor(sf::Color::White);
+			text.setString(text.getString() + '|');
 		} else {
 			box.setFillColor(grey);
+			if (text.getString().getSize() == 1) {
+				append('5');
+			}
+			text.setString(text.getString().substring(0, text.getString().getSize()-1));
 		}
 	}
 	void setPosition(short x, short y) {
 		box.setPosition(x, y);
 		text.setPosition(x, y);
 	}
-	std::string getText() { return text.getString(); }
-	bool mode;
+	
 	void append(char character) {
-		text.setString(text.getString() + character);
-		if (std::stoi(getText()) > 20) {
-			text.setString("20");
+		value += character;
+		text.setString(value + '|');
+		if (std::stoi(value) > 20) {
+			value = "20";
+			text.setString(value + '|');
 		}
 	}
-	void backSpace() { text.setString(text.getString().substring(0, text.getString().getSize() - 1));  }
+
+	void backSpace() {
+		if (value.size() != 0) {
+		value = value.substr(0, value.size()-1);
+		text.setString(value + '|');
+		}
+	}
+
+	int getSize() {
+		return std::stoi(value);
+	}
 	sf::RectangleShape box;
 	sf::Text text;
 };
@@ -50,14 +66,25 @@ public:
 class GUI {
 public:
 	static void setup();
-	static void drawPath(Node* first, Node* second);
-
+	static void update();
+	static void drawBridge(Coordinates node, Directions direction, bool traversed);
 private:
-	static void drawMaze();
+	static void disableInput();
+	static void enableInput();
+
+	static sf::RenderTexture canvas;
 	static Maze maze;
 	static sf::Text label;
+	static sf::Text regenLabel;
+	static sf::Text solverLabel;
 	static sf::RenderWindow window;
 	static textBox sizeBox;
 	static sf::RectangleShape regenButton;
 	static sf::RectangleShape solverButton;
+	static sf::RectangleShape tile;
+
+	static bool input;
+	static int size;
 };
+
+#endif
