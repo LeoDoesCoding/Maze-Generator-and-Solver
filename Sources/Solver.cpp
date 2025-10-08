@@ -4,7 +4,7 @@ using namespace std;
 bool Solver::found = false;
 
 PathNode* Solver::DFS(Coordinates location, Node* current, Node* goal) {
-    sf::sleep(sf::seconds(0.1));
+    sf::sleep(sf::seconds(0.05));
     current->visited = true;
     PathNode* pointer;
     PathNode* path = new PathNode(current);

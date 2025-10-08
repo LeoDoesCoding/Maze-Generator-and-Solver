@@ -25,13 +25,13 @@ public:
 		mode = status;
 		if (status) {
 			box.setFillColor(sf::Color::White);
-			text.setString(text.getString() + '|');
+			text.setString(value + '|');
 		} else {
 			box.setFillColor(grey);
-			if (text.getString().getSize() == 1) {
+			if (value.length() == 0) {
 				append('5');
 			}
-			text.setString(text.getString().substring(0, text.getString().getSize()-1));
+			text.setString(value);
 		}
 	}
 	void setPosition(short x, short y) {
@@ -67,7 +67,7 @@ class GUI {
 public:
 	static void setup();
 	static void update();
-	static void drawBridge(Coordinates node, Directions direction, bool traversed);
+	static void drawBridge(Coordinates node, Directions direction);
 private:
 	static void disableInput();
 	static void enableInput();
@@ -85,6 +85,9 @@ private:
 
 	static bool input;
 	static int size;
+	static PathNode* solution;
+	static PathNode* mazePointer;
+	static Coordinates UIpointer;
 };
 
 #endif

@@ -12,6 +12,9 @@ sf::RectangleShape GUI::solverButton;
 sf::RectangleShape GUI::tile;
 bool GUI::input;
 int GUI::size;
+PathNode* GUI::solution;
+PathNode* GUI::mazePointer;
+Coordinates GUI::UIpointer;
 
 int main() {
     GUI::setup();
@@ -111,6 +114,7 @@ void GUI::setup() {
                 bounds = regenButton.getGlobalBounds();
                 if (bounds.contains(mouse) && input) {
                     size = sizeBox.getSize();
+                    solution = nullptr;
                     maze = Maze();
                     maze.randomMaze(size);
                     update();
@@ -122,7 +126,7 @@ void GUI::setup() {
                     maze.resetSolver();
                     Solver::found = false;
                     GUI::disableInput();
-                    Solver::DFS({1,1}, maze.getStart(), maze.getGoal());
+                    solution = Solver::DFS({1,1}, maze.getStart(), maze.getGoal());
                     GUI::enableInput();
                 }
 
@@ -142,7 +146,7 @@ void GUI::update() {
     tile.setSize(sf::Vector2f(510/size, 510/size));
     for (auto& space : maze.getMaze()) {
     if (space.second->visited) {
-        tile.setFillColor(Color::Green);
+        tile.setFillColor(Color::Yellow);
     } else {
         tile.setFillColor(Color::White);
     }
@@ -153,7 +157,7 @@ void GUI::update() {
 
     //Draw bridges
     if (space.second->visited) {
-        tile.setFillColor(Color::Green);
+        tile.setFillColor(Color::Yellow);
     } else {
         tile.setFillColor(Color::White);
     }
@@ -161,11 +165,50 @@ void GUI::update() {
     window.draw(tile);
 
     if (space.second->East) {
-        drawBridge(space.first, EAST, (space.second->East->visited && space.second->visited));
+        if (space.second->East->visited && space.second->visited) {
+            tile.setFillColor(Color::Yellow);
+        } else {
+            tile.setFillColor(Color::White);
+        }
+        drawBridge(space.first, EAST);
     }
     if (space.second->South) {
-        drawBridge(space.first, SOUTH, (space.second->South->visited && space.second->visited));
+        if (space.second->South->visited && space.second->visited) {
+            tile.setFillColor(Color::Yellow);
+        } else {
+            tile.setFillColor(Color::White);
+        }
+        drawBridge(space.first, SOUTH);
     }
+    }
+
+    //Draw solved path (if applicable)
+    tile.setFillColor(Color::Green);
+    UIpointer = {1, 1};
+    mazePointer = solution;
+    while (mazePointer != nullptr) {
+        tile.setSize(sf::Vector2f(510/size, 510/size));
+        tile.setPosition((UIpointer.X * 680 - 595) / size + 20, (UIpointer.Y * 680 - 595) / size + 20);
+        window.draw(tile);
+
+        //Move UI pointer
+        if (mazePointer->next != nullptr) {
+            if (mazePointer->current->North == mazePointer->next->current) {
+                drawBridge(UIpointer, NORTH);
+                UIpointer = {UIpointer.X, UIpointer.Y-1};
+            } else if (mazePointer->current->East == mazePointer->next->current) {
+                drawBridge(UIpointer, EAST);
+                UIpointer = {UIpointer.X+1, UIpointer.Y};
+            } else if (mazePointer->current->South == mazePointer->next->current) {
+                drawBridge(UIpointer, SOUTH);
+                UIpointer = {UIpointer.X, UIpointer.Y+1};
+            } else if (mazePointer->current->West == mazePointer->next->current) {
+                drawBridge(UIpointer, WEST);
+                UIpointer = {UIpointer.X-1, UIpointer.Y};
+            }
+        }
+
+        mazePointer = mazePointer->next;
     }
 
     window.draw(sizeBox.box);
@@ -178,17 +221,11 @@ void GUI::update() {
     window.display();
 }
 
-void GUI::drawBridge(Coordinates node, Directions direction, bool traversed) {
-    if (traversed) {
-        tile.setFillColor(Color::Green);
-    } else {
-        tile.setFillColor(Color::White);
-    }
-
+void GUI::drawBridge(Coordinates node, Directions direction) {
     switch (direction) {
         case NORTH:
             tile.setSize(sf::Vector2f(510/size, 170/size+1));
-            tile.setPosition((node.Y * 680 - 85) / size + 20, (node.X * 680 - 595) / size + 20);
+            tile.setPosition((node.X * 680 - 595) / size + 20, (node.Y * 680 - 765) / size + 20);
             break;
         case EAST:
             tile.setSize(sf::Vector2f(170/size+1, 510/size));
@@ -200,7 +237,7 @@ void GUI::drawBridge(Coordinates node, Directions direction, bool traversed) {
             break;
         case WEST:
             tile.setSize(sf::Vector2f(170/size+1, 510/size));
-            tile.setPosition((node.Y * 680 - 595) / size + 20, (node.X * 680 - 85) / size + 20);
+            tile.setPosition((node.X * 680 - 765) / size + 20, (node.Y * 680 - 595) / size + 20);
             break;
     }
 

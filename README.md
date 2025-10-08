@@ -33,5 +33,6 @@ Starting from the selected node, the path from here, in the direction selected a
     - Probabilistic non-terminating.
     - A lot of invalid moves.
     - Maze complexity has no garuntee.
+ - Solution path is usually a fairly predictable diagonal line.
 
 I appologies if the generator draws unfortunate patterns.
