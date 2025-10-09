@@ -2,6 +2,7 @@
 #include "Maze.h"
 #include "Solver.h"
 #include <SFML/Graphics.hpp>
+#include <sstream>
 #ifndef GUI_H
 #define GUI H
 static sf::Font font;
@@ -71,12 +72,15 @@ public:
 private:
 	static void disableInput();
 	static void enableInput();
+	static void setMazeStats();
 
 	static sf::RenderTexture canvas;
 	static Maze maze;
 	static sf::Text label;
 	static sf::Text regenLabel;
 	static sf::Text solverLabel;
+	static sf::Text mazeStats;
+	static sf::Text solutionStats;
 	static sf::RenderWindow window;
 	static textBox sizeBox;
 	static sf::RectangleShape regenButton;

@@ -2,10 +2,13 @@
 
 using namespace std;
 bool Solver::found = false;
+int Solver::iterations;
+int Solver::pathLength;
 
 PathNode* Solver::DFS(Coordinates location, Node* current, Node* goal) {
     sf::sleep(sf::seconds(0.05));
     current->visited = true;
+    iterations++;
     PathNode* pointer;
     PathNode* path = new PathNode(current);
     GUI::update();

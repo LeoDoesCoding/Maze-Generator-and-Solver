@@ -6,6 +6,8 @@ Maze GUI::maze;
 sf::Text GUI::label;
 sf::Text GUI::regenLabel;
 sf::Text GUI::solverLabel;
+sf::Text GUI::mazeStats;
+sf::Text GUI::solutionStats;
 textBox GUI::sizeBox;
 sf::RectangleShape GUI::regenButton;
 sf::RectangleShape GUI::solverButton;
@@ -23,7 +25,7 @@ int main() {
 
 
 void GUI::setup() {
-    window.create(VideoMode(1000, 750), "Maze Solver");
+    window.create(VideoMode(1140, 770), "Maze Solver");
     window.setKeyRepeatEnabled(false);
     srand(time(NULL));
     font.loadFromFile("Arial.ttf");
@@ -41,23 +43,34 @@ void GUI::setup() {
 
     //Regenerate Button
     regenButton.setFillColor(sf::Color::Cyan);
-    regenButton.setSize(sf::Vector2f(200, 40));
-    regenButton.setPosition(750,590);
+    regenButton.setSize(sf::Vector2f(180, 40));
+    regenButton.setPosition(730,660);
     regenLabel.setString("Generate");
     regenLabel.setFont(font);
     regenLabel.setColor(sf::Color::Black);
-    regenLabel.setPosition(790, 590);
+    regenLabel.setPosition(760, 660);
 
     //Solver Button
     solverButton.setFillColor(sf::Color::Green);
-    solverButton.setSize(sf::Vector2f(200, 40));
-    solverButton.setPosition(750, 660);
+    solverButton.setSize(sf::Vector2f(180, 40));
+    solverButton.setPosition(930, 660);
     solverLabel.setString("Solve");
     solverLabel.setFont(font);
     solverLabel.setColor(sf::Color::Black);
-    solverLabel.setPosition(810, 660);
+    solverLabel.setPosition(980, 660);
+
+    //Satistics
+    mazeStats.setColor(sf::Color::Cyan);
+    mazeStats.setPosition(20, 710);
+    mazeStats.setFont(font);
+    mazeStats.setCharacterSize(20);
+    solutionStats.setColor(sf::Color::Green);
+    solutionStats.setPosition(20, 730);
+    solutionStats.setFont(font);
+    solutionStats.setCharacterSize(20);
 
     maze.randomMaze(5);
+    setMazeStats();
     update();
 
     while (window.isOpen()) {
@@ -117,6 +130,7 @@ void GUI::setup() {
                     solution = nullptr;
                     maze = Maze();
                     maze.randomMaze(size);
+                    setMazeStats();
                     update();
                 }
 
@@ -124,8 +138,9 @@ void GUI::setup() {
                 bounds = solverButton.getGlobalBounds();
                 if (bounds.contains(mouse) && input) {
                     maze.resetSolver();
-                    Solver::found = false;
                     GUI::disableInput();
+                    Solver::found = false;
+                    Solver::iterations = 0;
                     solution = Solver::DFS({1,1}, maze.getStart(), maze.getGoal());
                     GUI::enableInput();
                 }
@@ -183,32 +198,40 @@ void GUI::update() {
     }
 
     //Draw solved path (if applicable)
-    tile.setFillColor(Color::Green);
-    UIpointer = {1, 1};
-    mazePointer = solution;
-    while (mazePointer != nullptr) {
-        tile.setSize(sf::Vector2f(510/size, 510/size));
-        tile.setPosition((UIpointer.X * 680 - 595) / size + 20, (UIpointer.Y * 680 - 595) / size + 20);
-        window.draw(tile);
+    if (solution != nullptr) {
+        tile.setFillColor(Color::Green);
+        UIpointer = {1, 1};
+        mazePointer = solution;
+        Solver::pathLength = 0;
+        while (mazePointer != nullptr) {
+            Solver::pathLength++;
+            tile.setSize(sf::Vector2f(510/size, 510/size));
+            tile.setPosition((UIpointer.X * 680 - 595) / size + 20, (UIpointer.Y * 680 - 595) / size + 20);
+            window.draw(tile);
 
-        //Move UI pointer
-        if (mazePointer->next != nullptr) {
-            if (mazePointer->current->North == mazePointer->next->current) {
-                drawBridge(UIpointer, NORTH);
-                UIpointer = {UIpointer.X, UIpointer.Y-1};
-            } else if (mazePointer->current->East == mazePointer->next->current) {
-                drawBridge(UIpointer, EAST);
-                UIpointer = {UIpointer.X+1, UIpointer.Y};
-            } else if (mazePointer->current->South == mazePointer->next->current) {
-                drawBridge(UIpointer, SOUTH);
-                UIpointer = {UIpointer.X, UIpointer.Y+1};
-            } else if (mazePointer->current->West == mazePointer->next->current) {
-                drawBridge(UIpointer, WEST);
-                UIpointer = {UIpointer.X-1, UIpointer.Y};
+            //Move UI pointer
+            if (mazePointer->next != nullptr) {
+                if (mazePointer->current->North == mazePointer->next->current) {
+                    drawBridge(UIpointer, NORTH);
+                    UIpointer = {UIpointer.X, UIpointer.Y-1};
+                } else if (mazePointer->current->East == mazePointer->next->current) {
+                    drawBridge(UIpointer, EAST);
+                    UIpointer = {UIpointer.X+1, UIpointer.Y};
+                } else if (mazePointer->current->South == mazePointer->next->current) {
+                    drawBridge(UIpointer, SOUTH);
+                    UIpointer = {UIpointer.X, UIpointer.Y+1};
+                } else if (mazePointer->current->West == mazePointer->next->current) {
+                    drawBridge(UIpointer, WEST);
+                    UIpointer = {UIpointer.X-1, UIpointer.Y};
+                }
             }
-        }
 
-        mazePointer = mazePointer->next;
+            mazePointer = mazePointer->next;
+        }
+        std::ostringstream sSS;
+        sSS << "Iterations: " << Solver::iterations <<
+        "   Solution path length: " << Solver::pathLength;
+        solutionStats.setString(sSS.str());
     }
 
     window.draw(sizeBox.box);
@@ -218,6 +241,8 @@ void GUI::update() {
     window.draw(solverButton);
     window.draw(regenLabel);
     window.draw(solverLabel);
+    window.draw(solutionStats);
+    window.draw(mazeStats);
     window.display();
 }
 
@@ -254,4 +279,12 @@ void GUI::enableInput() {
     regenButton.setFillColor(sf::Color::Cyan);
     solverButton.setFillColor(sf::Color::Green);
     update();
+}
+
+void GUI::setMazeStats() {
+    std::ostringstream msSS;
+    msSS << "Iterations: " << maze.iterations <<
+    "   Occupied tiles: " << maze.occupied << "\/" << (size * size) <<
+    "   Connections: " << maze.connections << "\/" << (size * size + 2 * size - 1);
+    mazeStats.setString(msSS.str());
 }

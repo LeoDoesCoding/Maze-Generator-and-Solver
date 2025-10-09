@@ -1,9 +1,8 @@
-# Maze Generator & Solver [WIP]
+# Maze Generator & Solver [WIP, but working as intended]
 SFML libraries for Graphics, System and Window must be setup in order to run the code in VS.
 
 Todo:
  - Other maze-solving algorithms
- - Clean any code messes/optimise code
 
  ## Project Parameters
  - Generates a graph of nodes with a maximum of 4 bi-directional connections of equal value/distance, constrained by coordinate placement on a 2D array.
@@ -33,6 +32,7 @@ Starting from the selected node, the path from here, in the direction selected a
     - Probabilistic non-terminating.
     - A lot of invalid moves.
     - Maze complexity has no garuntee.
- - Solution path is usually a fairly predictable diagonal line.
+      - Solution path is usually a fairly predictable diagonal line.
+    - Stupidly high iteration count for larger mazes (increased chances of invalid moves).
 
 I appologies if the generator draws unfortunate patterns.

@@ -15,6 +15,11 @@ public:
     Node* getGoal() & { return maze[{dimensions.X, dimensions.Y}]; }
     void resetSolver();
 
+    //Maze stats
+    int iterations;
+    int occupied;
+    int connections;
+
 private:
     std::map<Coordinates, Node*> maze;  //Corrisponding maze coordinates
     Coordinates dimensions;             //Maze size
